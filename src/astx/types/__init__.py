@@ -9,6 +9,7 @@ from astx.types.boolean import (
 from astx.types.casting import (
     TypeCastExpr,
 )
+from astx.types.collections import ListType, MapType, SetType, TupleType
 from astx.types.numeric import (
     Complex,
     Complex32,
@@ -80,4 +81,8 @@ __all__ = [
     "UTF8String",
     "UnsignedInteger",
     "TypeCastExpr",
+    "ListType",
+    "SetType",
+    "TupleType",
+    "MapType",
 ]

@@ -1,7 +1,10 @@
 """Test Python Transpiler."""
 
+from typing import Dict, List, Set
+
 import astx
 
+from astx.literals.base import Literal
 from astx.tools.transpilers import python as astx2py
 
 transpiler = astx2py.ASTxPythonTranspiler()
@@ -788,3 +791,76 @@ def test_transpiler_classdefstmt() -> None:
     assert (
         generated_code == expected_code
     ), f"Expected '{expected_code}', but got '{generated_code}'"
+
+
+def test_literal_list() -> None:
+    """Test astx.LiteralList."""
+    # Create a LiteralList node
+    elements: List[Literal] = [
+        astx.LiteralInt32(1),
+        astx.LiteralInt32(2),
+        astx.LiteralInt32(3),
+    ]
+    literal_list_node = astx.LiteralList(elements=elements)
+
+    # Generate Python code
+    generated_code = transpiler.visit(literal_list_node)
+    expected_code = "[1, 2, 3]"
+
+    assert generated_code == expected_code, "generated_code != expected_code"
+
+
+def test_literal_set() -> None:
+    """Test astx.LiteralSet."""
+    # Create a LiteralSet node
+    elements: Set[Literal] = {
+        astx.LiteralInt32(1),
+        astx.LiteralInt32(2),
+        astx.LiteralInt32(3),
+    }
+    literal_set_node = astx.LiteralSet(elements=elements)
+
+    # Generate Python code
+    generated_code = transpiler.visit(literal_set_node)
+
+    # Since sets are unordered, compare the evaluated sets
+    generated_set = eval(generated_code)
+    expected_set = {1, 2, 3}
+
+    assert generated_set == expected_set, "generated_set != expected_set"
+
+
+def test_literal_tuple() -> None:
+    """Test astx.LiteralTuple."""
+    # Create a LiteralTuple node
+    elements = (
+        astx.LiteralInt32(1),
+        astx.LiteralInt32(2),
+        astx.LiteralInt32(3),
+    )
+    literal_tuple_node = astx.LiteralTuple(elements=elements)
+
+    # Generate Python code
+    generated_code = transpiler.visit(literal_tuple_node)
+    expected_code = "(1, 2, 3)"
+
+    assert generated_code == expected_code, "generated_code != expected_code"
+
+
+def test_literal_map() -> None:
+    """Test astx.LiteralMap."""
+    # Create a LiteralMap node
+    elements: Dict[Literal, Literal] = {
+        astx.LiteralInt32(1): astx.LiteralUTF8String("a"),
+        astx.LiteralInt32(2): astx.LiteralUTF8String("b"),
+    }
+    literal_map_node = astx.LiteralMap(elements=elements)
+
+    # Generate Python code
+    generated_code = transpiler.visit(literal_map_node)
+
+    # Compare the evaluated dictionaries
+    generated_dict = eval(generated_code)
+    expected_dict = {1: "a", 2: "b"}
+
+    assert generated_dict == expected_dict, "generated_dict != expected_dict"
